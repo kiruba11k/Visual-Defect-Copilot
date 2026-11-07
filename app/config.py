@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     groq_timeout_seconds: int = 45
     database_url: str | None = None
 
+    supabase_url: str | None = None
+    supabase_service_role_key: str | None = None
+    supabase_storage_bucket: str = "defect-reference-data"
+    supabase_reference_category: str = "bottle"
+
     data_dir: Path = Path("data")
     artifact_dir: Path = Path("artifacts")
     device: str = "auto"
