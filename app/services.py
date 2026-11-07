@@ -113,10 +113,11 @@ def build_knowledge_index(force=False):
     return get_knowledge().build_dense_index(force=force)
 
 
-def ensure_reference_assets(category: str):
+def ensure_reference_assets(category: str | None = None):
     global _assets_ready
 
     configured_category = settings.supabase_reference_category.strip()
+    category = category or configured_category
     if category != configured_category:
         raise ValueError(
             f"Reference bank is configured for '{configured_category}', not '{category}'."
