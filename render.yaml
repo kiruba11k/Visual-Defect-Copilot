@@ -21,7 +21,7 @@ services:
       - key: SUPABASE_REFERENCE_CATEGORY
         value: bottle
       - key: CORS_ORIGINS
-        value: http://localhost:5173
+        value: https://visual-defect-copilot-frontend.onrender.com
       - key: ENABLE_SEMANTIC_RAG
         value: "false"
       - key: DEVICE
