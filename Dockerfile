@@ -6,4 +6,9 @@ COPY app ./app
 RUN pip install --no-cache-dir .
 COPY . .
 EXPOSE 8000
+ENV OMP_NUM_THREADS=1
+ENV OPENBLAS_NUM_THREADS=1
+ENV MKL_NUM_THREADS=1
+ENV TOKENIZERS_PARALLELISM=false
+
 CMD ["sh", "-c", "uvicorn app.api.main:app --host 0.0.0.0 --port ${PORT:-10000} --workers 1"]
