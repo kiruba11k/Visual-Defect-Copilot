@@ -161,13 +161,13 @@ def ensure_reference_assets() -> dict:
 
     manifest_object = f"{category}/reference_bank_manifest.json"
     manifest = json.loads(_request_bytes(manifest_object).decode("utf-8"))
-    expected_sha = str(manifest.get("sha256") or "").lower()
+    expected_sha = str(manifest.get("sha256") or manifest.get("bank_sha256") or "").lower()
     if len(expected_sha) != 64:
         raise SupabaseStorageError(
             "Bank manifest is missing a valid SHA-256 checksum."
         )
 
-    expected_size = manifest.get("bank_size") or manifest.get("size")
+    expected_size = manifest.get("bank_size") or manifest.get("size_bytes") or manifest.get("size")
     if bank_path.exists() and _sha256(bank_path) == expected_sha:
         logger.info("Using verified reference bank cache at %s", bank_path)
     else:
