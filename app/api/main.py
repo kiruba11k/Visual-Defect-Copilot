@@ -7,8 +7,11 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.services import (
-    investigate, index_category, ingest_knowledge_file,
-    build_knowledge_index, knowledge,
+    investigate,
+    index_category,
+    ingest_knowledge_file,
+    build_knowledge_index,
+    knowledge_status,
 )
 from app.config import settings
 
@@ -45,12 +48,12 @@ def database_health():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "knowledge": knowledge.status()}
+    return {"status": "ok"}
 
 
 @app.get("/knowledge/status")
-def knowledge_status():
-    return knowledge.status()
+def get_knowledge_status():
+    return knowledge_status()
 
 
 @app.post("/knowledge/ingest")
@@ -73,7 +76,11 @@ async def ingest_document(file: UploadFile = File(...)):
     destination.write_bytes(content)
     try:
         result = ingest_knowledge_file(destination)
-        return {"status": "ingested", **result, "knowledge": knowledge.status()}
+        return {
+    "status": "ingested",
+    **result,
+    "knowledge": knowledge_status(),
+}
     except Exception as exc:
         destination.unlink(missing_ok=True)
         raise HTTPException(status_code=400, detail=str(exc))
