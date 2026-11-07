@@ -113,8 +113,14 @@ def build_knowledge_index(force=False):
     return get_knowledge().build_dense_index(force=force)
 
 
-def ensure_reference_assets():
+def ensure_reference_assets(category: str):
     global _assets_ready
+
+    configured_category = settings.supabase_reference_category.strip()
+    if category != configured_category:
+        raise ValueError(
+            f"Reference bank is configured for '{configured_category}', not '{category}'."
+        )
 
     with _component_lock:
         if not _assets_ready:
@@ -129,7 +135,7 @@ def investigate(
     category: str,
     query: str | None = None,
 ):
-    ensure_reference_assets()
+    ensure_reference_assets(category)
     extractor = get_extractor()
     bank = get_bank()
     knowledge = get_knowledge()
