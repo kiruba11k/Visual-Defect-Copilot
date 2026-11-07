@@ -19,6 +19,7 @@ _extractor = None
 _bank = None
 _knowledge = None
 _workflow = None
+_assets_ready = False
 
 
 def get_extractor():
@@ -112,11 +113,23 @@ def build_knowledge_index(force=False):
     return get_knowledge().build_dense_index(force=force)
 
 
+def ensure_reference_assets():
+    global _assets_ready
+
+    with _component_lock:
+        if not _assets_ready:
+            from app.storage.supabase_storage import ensure_reference_assets as restore_assets
+
+            restore_assets()
+            _assets_ready = True
+
+
 def investigate(
     image_path: Path,
     category: str,
     query: str | None = None,
 ):
+    ensure_reference_assets()
     extractor = get_extractor()
     bank = get_bank()
     knowledge = get_knowledge()
