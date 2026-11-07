@@ -124,9 +124,18 @@ def ensure_reference_assets(category: str):
 
     with _component_lock:
         if not _assets_ready:
-            from app.storage.supabase_storage import ensure_reference_assets as restore_assets
+            if settings.supabase_url and settings.supabase_service_role_key:
+                from app.storage.supabase_storage import ensure_reference_assets as restore_assets
 
-            restore_assets()
+                restore_assets()
+            elif not (
+                (settings.artifact_dir / "reference_bank.npz").exists()
+                and (settings.artifact_dir / "reference_metadata.json").exists()
+            ):
+                raise RuntimeError(
+                    "Reference assets are unavailable. Configure Supabase or "
+                    "build a local reference bank first."
+                )
             _assets_ready = True
 
 
