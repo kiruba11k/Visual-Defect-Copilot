@@ -52,6 +52,10 @@ class ReferenceBank:
         self.features = None
         self.paths = []
         self.category = None
+        # Derived caches are small compared with the feature bank and are
+        # populated once per process, not rebuilt for every investigation.
+        self._reference_norms = None
+        self._image_embedding_cache = {}
 
     def build(self, image_paths, extractor: FeatureExtractor, category: str):
         maps, paths = [], []
@@ -62,9 +66,13 @@ class ReferenceBank:
             paths.append(str(path))
         if not maps:
             raise ValueError("No normal reference images found.")
-        self.features = np.concatenate(maps, axis=0)
+        self.features = np.ascontiguousarray(np.concatenate(maps, axis=0), dtype=np.float32)
         self.paths = paths
         self.category = category
+        self._reference_norms = np.einsum(
+            "ij,ij->i", self.features, self.features, optimize=True
+        )
+        self._image_embedding_cache.clear()
         self.artifact_dir.mkdir(parents=True, exist_ok=True)
         np.savez_compressed(self.bank_path, features=self.features)
         self.meta_path.write_text(json.dumps({"paths": paths, "category": category}, indent=2))
@@ -73,9 +81,14 @@ class ReferenceBank:
     def load(self):
         if not self.bank_path.exists() or not self.meta_path.exists():
             raise FileNotFoundError("Reference bank missing. Run the index command first.")
-        self.features = np.load(self.bank_path)["features"]
+        with np.load(self.bank_path) as archive:
+            # Normalize dtype once during loading. Repeated astype(float32)
+            # calls during inference can otherwise duplicate the full bank.
+            self.features = np.asarray(archive["features"], dtype=np.float32)
         meta = json.loads(self.meta_path.read_text())
         self.paths, self.category = meta["paths"], meta["category"]
+        self._reference_norms = None
+        self._image_embedding_cache.clear()
         return self
 
     
@@ -86,11 +99,17 @@ class ReferenceBank:
         fmap = extractor.feature_map(image)
         h, w, c = fmap.shape
 
-        query = fmap.reshape(-1, c).astype(np.float32)
-        ref = self.features.astype(np.float32)
+        query = np.asarray(fmap.reshape(-1, c), dtype=np.float32)
+        # Keep a single reference-bank array in memory. The previous astype()
+        # could allocate another ~100 MiB copy on every investigation.
+        ref = self.features
 
-        # Precompute squared norms of reference features.
-        ref_norms = np.sum(ref * ref, axis=1)
+        # Cache squared reference norms; they do not change between requests.
+        if self._reference_norms is None:
+            self._reference_norms = np.einsum(
+                "ij,ij->i", ref, ref, optimize=True
+            )
+        ref_norms = self._reference_norms
 
         distances = []
 
@@ -169,6 +188,11 @@ class ReferenceBank:
         q = extractor.image_embedding(image)
         scored = []
         for path in self.paths:
-            emb = extractor.image_embedding(path)
+            # Reference images are immutable during inference. Cache their
+            # compact 128-value embeddings instead of rerunning ResNet18.
+            emb = self._image_embedding_cache.get(path)
+            if emb is None:
+                emb = extractor.image_embedding(path)
+                self._image_embedding_cache[path] = emb
             scored.append((float(np.dot(q, emb)), path))
         return [{"similarity": s, "image_path": p} for s,p in sorted(scored, reverse=True)[:top_k]]
