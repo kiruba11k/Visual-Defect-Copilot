@@ -12,6 +12,7 @@ from app.services import (
     ingest_knowledge_file,
     build_knowledge_index,
     knowledge_status,
+    ensure_reference_assets,
 )
 from app.config import settings
 
@@ -23,6 +24,14 @@ app = FastAPI(
         "BM25+dense technical-document retrieval and LangGraph investigation."
     ),
 )
+
+
+@app.on_event("startup")
+def restore_reference_assets_on_startup():
+    # Restore remote assets before the service starts accepting investigations.
+    # Local development can continue using a previously indexed local bank.
+    if settings.supabase_url and settings.supabase_service_role_key:
+        ensure_reference_assets()
 
 
 _origins = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
