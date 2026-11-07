@@ -1,0 +1,36 @@
+[
+  {
+    "id": "SAMPLE-001",
+    "source": "synthetic_demo_incidents",
+    "title": "Example: linear scratch on bottle outer surface",
+    "text": "Example: linear scratch on bottle outer surface glass bottle linear scratch along the outer edge Not established in this synthetic example Example inspection note: inspect handling contact points and retain the affected sample for review Synthetic demonstration record only. Not a validated maintenance instruction. bottle  synthetic_demo_incidents",
+    "metadata": {
+      "id": "SAMPLE-001",
+      "title": "Example: linear scratch on bottle outer surface",
+      "component": "glass bottle",
+      "symptom": "linear scratch along the outer edge",
+      "cause": "Not established in this synthetic example",
+      "action": "Example inspection note: inspect handling contact points and retain the affected sample for review",
+      "notes": "Synthetic demonstration record only. Not a validated maintenance instruction.",
+      "category": "bottle",
+      "source": "synthetic_demo_incidents"
+    }
+  },
+  {
+    "id": "SAMPLE-002",
+    "source": "synthetic_demo_incidents",
+    "title": "Example: surface contamination on container",
+    "text": "Example: surface contamination on container container surface visible foreign material or residue Not established in this synthetic example Example inspection note: verify cleaning and material handling records Synthetic demonstration record only. Not a validated maintenance instruction. contamination  synthetic_demo_incidents",
+    "metadata": {
+      "id": "SAMPLE-002",
+      "title": "Example: surface contamination on container",
+      "component": "container surface",
+      "symptom": "visible foreign material or residue",
+      "cause": "Not established in this synthetic example",
+      "action": "Example inspection note: verify cleaning and material handling records",
+      "notes": "Synthetic demonstration record only. Not a validated maintenance instruction.",
+      "category": "contamination",
+      "source": "synthetic_demo_incidents"
+    }
+  }
+]

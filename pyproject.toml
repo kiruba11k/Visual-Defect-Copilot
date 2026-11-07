@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "visual-manufacturing-defect-copilot"
+version = "0.1.0"
+description = "Evidence-grounded visual defect investigation using anomaly detection, retrieval and agent workflows"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9",
+  "pydantic>=2.6", "pydantic-settings>=2.2", "numpy>=1.26",
+  "Pillow>=10.2", "opencv-python-headless>=4.9", "torch>=2.2",
+  "torchvision>=0.17", "scikit-learn>=1.4", "pandas>=2.2",
+  "rank-bm25>=0.2.2", "langgraph>=0.2", "groq>=0.11",
+  "python-dotenv>=1.0", "pypdf>=4.0", "python-docx>=1.1", "SQLAlchemy>=2.0", "psycopg[binary]>=3.2"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27", "ruff>=0.4"]
+semantic = ["sentence-transformers>=3.0"]
+faiss = ["faiss-cpu>=1.8"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

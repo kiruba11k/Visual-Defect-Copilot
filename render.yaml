@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: visual-defect-copilot-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        value: http://localhost:5173
+      - key: ENABLE_SEMANTIC_RAG
+        value: "false"
+      - key: DEVICE
+        value: cpu
+
+  - type: web
+    name: visual-defect-copilot-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
