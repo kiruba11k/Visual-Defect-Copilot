@@ -31,8 +31,10 @@ dense retrieval but does not remove the PyTorch import. Do not treat the free
 deployment as validated until cold start, memory, and real inference tests pass.
 A lightweight ONNX inference path or external inference worker may be needed.
 
-This patch does not yet implement Supabase/object storage for uploaded documents
-and FAISS artifacts. Do not rely on Render's local filesystem for persistent data.
+Render's local filesystem is an instance cache, not durable storage. Supabase
+Storage is used to restore the reference bank and reference images after instance
+restarts. Other uploaded documents and knowledge artifacts still need a separate
+persistence strategy before they can be considered durable.
 
 
 ## Supabase reference assets
