@@ -1,8 +1,9 @@
 import { useState } from "react";
-const VITE_API_URL="http://localhost:8000"
 
-const API = (VITE_API_URL || "").replace(/\/$/, "");
-type Result = {
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:8000"
+).replace(/\/$/, "");type Result = {
   category: string;
   anomaly_score: number;
   report: string;
