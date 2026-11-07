@@ -39,8 +39,8 @@ persistence strategy before they can be considered durable.
 
 ## Supabase reference assets
 
-The backend restores the private reference bank from Supabase Storage on the
-first investigation request after each instance start. The downloaded bank is
+The backend restores the private reference bank from Supabase Storage during
+application startup, before it begins accepting investigation requests. The downloaded bank is
 verified against the SHA-256 checksum in
 `{category}/reference_bank_manifest.json`; reference images are cached under
 `ARTIFACT_DIR/reference_images/{category}`. The existing local cache is reused
