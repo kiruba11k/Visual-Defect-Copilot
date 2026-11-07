@@ -33,3 +33,29 @@ A lightweight ONNX inference path or external inference worker may be needed.
 
 This patch does not yet implement Supabase/object storage for uploaded documents
 and FAISS artifacts. Do not rely on Render's local filesystem for persistent data.
+
+
+## Supabase reference assets
+
+The backend restores the private reference bank from Supabase Storage on the
+first investigation request after each instance start. The downloaded bank is
+verified against the SHA-256 checksum in
+`{category}/reference_bank_manifest.json`; reference images are cached under
+`ARTIFACT_DIR/reference_images/{category}`. The existing local cache is reused
+when its bank checksum matches.
+
+Set these variables on the **backend only** (never expose the service-role key
+to the Vite frontend):
+
+- `SUPABASE_URL`: project URL, for example `https://your-project.supabase.co`
+- `SUPABASE_SERVICE_ROLE_KEY`: server-side service-role secret
+- `SUPABASE_STORAGE_BUCKET`: private bucket name; defaults to
+  `defect-reference-data`
+- `SUPABASE_REFERENCE_CATEGORY`: uploaded category; defaults to `bottle`
+
+For local development, put the same variables in the backend `.env` file.
+Do not commit `.env` or service-role credentials.
+
+The initial integration currently supports the uploaded `bottle` reference
+bank. Additional categories need their own uploaded manifests, metadata and
+image objects, plus corresponding validation.
